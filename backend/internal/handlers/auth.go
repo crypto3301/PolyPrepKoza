@@ -8,9 +8,14 @@ import (
 )
 
 type RegisterRequest struct {
-	Username string `json: "username"`
-	Email    string `json: "email"`
-	Password string `json: "password"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func RegisterUser(c *gin.Context) {
@@ -36,4 +41,21 @@ func RegisterUser(c *gin.Context) {
 
 func validateEmail(email string) bool {
 	return len(email) > 13 && email[len(email)-14:] == "@edu.spbstu.ru"
+}
+
+func LoginUser(c *gin.Context) {
+	var request LoginRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+		return
+	}
+
+	token, err := auth.AuthenticateUser(request.Username, request.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication failed: " + err.Error()})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"access_token": token})
 }

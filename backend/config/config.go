@@ -25,7 +25,7 @@ func LoadConfig() *Config {
 		ServerPort:   getEnv("SERVER_PORT", "8081"),
 		KeycloackURL: getEnv("KEYCLOACK_URL", "http://192.168.0.102:8080"),
 		ClientID:     getEnv("CLIENT_ID", "polyclient"),
-		ClientSecret: getEnv("CLIENT_SECRET", "jtfzpXIbb0YVGZqeJQb290zxTQ1QdxWt"),
+		ClientSecret: getEnv("CLIENT_SECRET", "opab4laUFRhlvPQgwp8DgSjGYV4kvPdp"),
 		Realm:        getEnv("REALM", "master"),
 	}
 }

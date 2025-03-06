@@ -14,7 +14,7 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080"
       REALM: "master"
       CLIENT_ID: "polyclient"
-      CLIENT_SECRET: "jtfzpXIbb0YVGZqeJQb290zxTQ1QdxWt"
+      CLIENT_SECRET: "opab4laUFRhlvPQgwp8DgSjGYV4kvPdp"
 
   keycloak:
     image: quay.io/keycloak/keycloak:20.0.1

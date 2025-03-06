@@ -20,6 +20,44 @@ type KeycloakUser struct {
 	} `json:"credentials"`
 }
 
+func AuthenticateUser(username, password string) (string, error) {
+	keycloakURL := os.Getenv("KEYCLOAK_URL")
+	clientID := os.Getenv("CLIENT_ID")
+	clientSecret := os.Getenv("CLIENT_SECRET")
+	realm := os.Getenv("REALM")
+
+	data := fmt.Sprintf("client_id=%s&client_secret=%s&username=%s&password=%s&grant_type=password", clientID, clientSecret, username, password)
+	req, err := http.NewRequest("POST", keycloakURL+"/realms/"+realm+"/protocol/openid-connect/token", bytes.NewBuffer([]byte(data)))
+	if err != nil {
+		return "", fmt.Errorf("ошибка создания запроса: %v", err)
+	}
+
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("ошибка отправки запроса: %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("ошибка Keycloak: %s", string(body))
+	}
+
+	var result map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("ошибка декодирования ответа: %v", err)
+	}
+
+	if result["access_token"] == nil {
+		return "", fmt.Errorf("токен доступа не найден в ответе")
+	}
+
+	return result["access_token"].(string), nil
+}
+
 func CreateUser(username, email, password string) error {
 	keycloakURL := os.Getenv("KEYCLOAK_URL")
 	realm := os.Getenv("REALM")
